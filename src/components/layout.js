@@ -6,46 +6,61 @@
  */
 
 import React from "react"
-import PropTypes from "prop-types"
-import { useStaticQuery, graphql } from "gatsby"
+//import Header from "./header"
+import MainMenu from "./MainMenu"
+import styled, {createGlobalStyle} from 'styled-components';
+import {Helmet} from "react-helmet"
+import { graphql, StaticQuery} from "gatsby"
 
-import Header from "./header"
-import "./layout.css"
+const GlobalStyles = createGlobalStyle`
+  body, html{
+    font-family: 'Open Sans', sans-serif;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 
-const Layout = ({ children }) => {
-  const data = useStaticQuery(graphql`
-    query SiteTitleQuery {
-      site {
-        siteMetadata {
-          title
+`
+
+const LayoutWrapper = styled.div`
+  max-width:960px;
+  margin: 0 auto;
+`
+
+// const Layout = ({ children}) => (
+//   <div>
+//     <GlobalStyles />
+//     <MainMenu />
+//     <LayoutWrapper>
+//     {children}
+//     </LayoutWrapper>
+//   </div>
+// )
+
+const Layout = ({ children }) => (
+  <>
+    <StaticQuery query={graphql`
+      {
+        allWordpressWpFavicon{
+          edges{
+            node{
+              url{
+                source_url
+              }
+            }
+          }
         }
       }
-    }
-  `)
-
-  return (
-    <>
-      <Header siteTitle={data.site.siteMetadata.title} />
-      <div
-        style={{
-          margin: `0 auto`,
-          maxWidth: 960,
-          padding: `0 1.0875rem 1.45rem`,
-        }}
-      >
-        <main>{children}</main>
-        <footer>
-          © {new Date().getFullYear()}, Built with
-          {` `}
-          <a href="https://www.gatsbyjs.org">Gatsby</a>
-        </footer>
-      </div>
-    </>
-  )
-}
-
-Layout.propTypes = {
-  children: PropTypes.node.isRequired,
-}
+    `} render={props => 
+    <Helmet>
+      <link rel="icon" href={props.allWordpressWpFavicon.edges[0].node.url.source_url} />
+      <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&display=swap" rel="stylesheet"/>
+    </Helmet>} />
+    <GlobalStyles />
+    <MainMenu />
+    <LayoutWrapper>
+      {children}
+    </LayoutWrapper>
+  </>
+);
 
 export default Layout
